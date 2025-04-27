@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Name is required'],
     trim: true,
+    
   },
   email: {
     type: String,
@@ -29,6 +30,9 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  address: {
+    type:String,
+  }
 }, {
   timestamps: true,
 });

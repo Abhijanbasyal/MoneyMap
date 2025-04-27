@@ -1,0 +1,16 @@
+IN expressjS server ma 
+http://localhost:8000
+
+1) server.js (MY main file) database connection bina run hunna
+2) models (database) // mongo db key/value id: value: 
+3) routes 
+4) controller
+
+
+features to be noted:
+track 
+catrgory
+notification 
+export data in pdf
+multicurrency suppoert
+dark mode

@@ -1,23 +1,21 @@
-// File: controllers/expenseController.js
 import asyncHandler from 'express-async-handler';
 import Expense from '../models/Expense.js';
 import Category from '../models/Category.js';
 import User from '../models/User.js';
+import { createError } from '../utils/errorHandler.js';
 
 // Create Expense (Unrestricted for testing)
-export const createExpense = asyncHandler(async (req, res) => {
+export const createExpense = asyncHandler(async (req, res, next) => {
   const { amount, category, user, description, date } = req.body;
 
   if (!amount || !category) {
-    res.status(400);
-    throw new Error('Amount and category are required');
+    return next(createError(400, 'Amount and category are required'));
   }
 
   // Verify category exists
   const categoryDoc = await Category.findById(category);
   if (!categoryDoc) {
-    res.status(404);
-    throw new Error('Category not found');
+    return next(createError(404, 'Category not found'));
   }
 
   // Verify user exists (for unrestricted access)
@@ -25,14 +23,12 @@ export const createExpense = asyncHandler(async (req, res) => {
   if (!userId && user) {
     const userDoc = await User.findById(user);
     if (!userDoc) {
-      res.status(404);
-      throw new Error('User not found');
+      return next(createError(404, 'User not found'));
     }
     userId = user;
   }
   if (!userId) {
-    res.status(400);
-    throw new Error('User is required');
+    return next(createError(400, 'User is required'));
   }
 
   const expense = await Expense.create({
@@ -51,20 +47,18 @@ export const createExpense = asyncHandler(async (req, res) => {
 });
 
 // Get User's Expenses (Unrestricted for testing)
-export const getUserExpenses = asyncHandler(async (req, res) => {
+export const getUserExpenses = asyncHandler(async (req, res, next) => {
   const userId = req.params.id;
 
   console.log("User ID received:", userId);
 
   if (!userId) {
-    res.status(400);
-    throw new Error('User ID is required');
+    return next(createError(400, 'User ID is required'));
   }
 
   const user = await User.findById(userId);
   if (!user) {
-    res.status(404);
-    throw new Error('User not found');
+    return next(createError(404, 'User not found'));
   }
 
   const expenses = await Expense.find({ user: userId })
@@ -75,22 +69,20 @@ export const getUserExpenses = asyncHandler(async (req, res) => {
 });
 
 // Update Expense (Unrestricted for testing)
-export const updateExpense = asyncHandler(async (req, res) => {
+export const updateExpense = asyncHandler(async (req, res, next) => {
   const expenseId = req.params.id;
   const { amount, category, description, date } = req.body;
 
   const expense = await Expense.findById(expenseId);
   if (!expense) {
-    res.status(404);
-    throw new Error('Expense not found');
+    return next(createError(404, 'Expense not found'));
   }
 
   // Verify category if provided
   if (category) {
     const categoryDoc = await Category.findById(category);
     if (!categoryDoc) {
-      res.status(404);
-      throw new Error('Category not found');
+      return next(createError(404, 'Category not found'));
     }
     expense.category = category;
   }
@@ -98,8 +90,7 @@ export const updateExpense = asyncHandler(async (req, res) => {
   // Update fields if provided
   if (amount !== undefined) {
     if (amount < 0) {
-      res.status(400);
-      throw new Error('Amount cannot be negative');
+      return next(createError(400, 'Amount cannot be negative'));
     }
     expense.amount = amount;
   }
@@ -125,13 +116,12 @@ export const updateExpense = asyncHandler(async (req, res) => {
 });
 
 // Delete Expense (Unrestricted for testing)
-export const deleteExpense = asyncHandler(async (req, res) => {
+export const deleteExpense = asyncHandler(async (req, res, next) => {
   const expenseId = req.params.id;
 
   const expense = await Expense.findById(expenseId);
   if (!expense) {
-    res.status(404);
-    throw new Error('Expense not found');
+    return next(createError(404, 'Expense not found'));
   }
 
   const userId = expense.user;
