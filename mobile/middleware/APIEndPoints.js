@@ -14,10 +14,18 @@ const APIEndPoints = {
         url: `${SERVER_DOMAIN}/users/register`,
         method: 'POST'
     },
-    logOutUser:{
+    logOutUser: {
         url: `${SERVER_DOMAIN}/users/logout`,
         method: 'POST'
 
+    },
+    update_user: {
+        url: `${SERVER_DOMAIN}/users`,
+        method: 'PUT'
+    },
+    delete_user:{
+        url: `${SERVER_DOMAIN}/users`,
+        method: 'DELETE'
     }
 }
 

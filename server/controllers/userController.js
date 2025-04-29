@@ -75,7 +75,7 @@ export const getUserProfile = asyncHandler(async (req, res, next) => {
 // Update User (Unrestricted for testing)
 export const updateUser = asyncHandler(async (req, res, next) => {
   const userId = req.params.id;
-  const { name, email, password } = req.body;
+  const { name, email, password, address } = req.body;
 
   const user = await User.findById(userId);
   if (!user) {
@@ -93,6 +93,7 @@ export const updateUser = asyncHandler(async (req, res, next) => {
 
   // Update fields if provided
   if (name) user.name = name;
+  if (address) user.address = address;
   if (password) {
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
@@ -105,6 +106,7 @@ export const updateUser = asyncHandler(async (req, res, next) => {
     name: user.name,
     email: user.email,
     expenses: user.expenses,
+    address: user.address,
   });
 });
 
