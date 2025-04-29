@@ -1,4 +1,5 @@
-const SERVER_DOMAIN = "http://192.168.80.41:8000/api" //hostel_4/5 Wifi
+// const SERVER_DOMAIN = "http://192.168.1.88:8000/api" //hostel_4/5 Wifi
+const SERVER_DOMAIN = "http://192.168.80.41:8000/api" //wifi others
 
 
 
@@ -9,10 +10,15 @@ const APIEndPoints = {
         url: `${SERVER_DOMAIN}/users/login`,
         method: 'post'
     },
-    get_subjects: {
-        url: `${SERVER_DOMAIN}/subjects/all`,
-        method: 'GET'
+    sign_up: {
+        url: `${SERVER_DOMAIN}/users/register`,
+        method: 'POST'
     },
+    logOutUser:{
+        url: `${SERVER_DOMAIN}/users/logout`,
+        method: 'POST'
+
+    }
 }
 
 export default APIEndPoints;

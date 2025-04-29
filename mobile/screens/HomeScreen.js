@@ -10,7 +10,7 @@ export default function HomeScreen() {
   return (
     <Layout>
       <Text className="text-primary text-2xl font-bold mb-2 text-primary-light dark:text-primary-dark">
-        Welcome, {currentUser ? currentUser.username : 'Guest'}!
+        Welcome, {currentUser ? currentUser.name : 'Guest'}!
       </Text>
       <Text className="text-2xl font-bold text-primary-light dark:text-primary-dark">Home Page</Text>
     </Layout>

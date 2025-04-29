@@ -124,3 +124,8 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
 
   res.json({ message: 'User deleted successfully' });
 });
+
+
+export const logoutUser = asyncHandler(async (req, res, next) => {
+  res.json({ message: 'Logout successful. Please remove your token.' });
+});
