@@ -62,7 +62,7 @@ export default function Header() {
         <View className="flex-row items-center">
           <Image
             source={LogoMoneyMap}
-            className="w-8 h-8 mr-2 rounded-es-full"
+            className="w-8 h-8 mr-2 rounded-full"
             resizeMode="contain"
           />
           <Text className="text-white font-bold text-xl">MoneyMap</Text>

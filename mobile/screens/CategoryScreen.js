@@ -5,12 +5,13 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import APIEndPoints from '../middleware/APIEndPoints';
 import { useDispatch, useSelector } from 'react-redux';
-import { Trash2 } from 'lucide-react-native';
+import { Trash2, Edit2 } from 'lucide-react-native';
 
 const CategoryScreen = () => {
   const [categoryName, setCategoryName] = useState('');
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
   const { currentUser } = useSelector((state) => state.user);
 
   const fetchCategories = async () => {
@@ -37,7 +38,7 @@ const CategoryScreen = () => {
     fetchCategories();
   }, []);
 
-  const handleCreateCategory = async () => {
+  const handleCreateOrUpdateCategory = async () => {
     if (!categoryName.trim()) {
       Toast.show({
         type: 'error',
@@ -49,39 +50,61 @@ const CategoryScreen = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post(
-        APIEndPoints.createCategory.url,
-        { name: categoryName },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${currentUser.token}`,
-          },
-        }
-      );
+      let response;
+      if (editingCategory) {
+        // Update existing category
+        response = await axios.put(
+          `${APIEndPoints.updateCategory.url}/${editingCategory._id}`,
+          { name: categoryName },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${currentUser.token}`,
+            },
+          }
+        );
+      } else {
+        // Create new category
+        response = await axios.post(
+          APIEndPoints.createCategory.url,
+          { name: categoryName },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${currentUser.token}`,
+            },
+          }
+        );
+      }
 
       setCategoryName('');
-      fetchCategories(); // Refresh the list
+      setEditingCategory(null);
+      fetchCategories();
       Toast.show({
         type: 'success',
         text1: 'Success',
-        text2: 'Category created successfully',
+        text2: editingCategory ? 'Category updated successfully' : 'Category created successfully',
       });
     } catch (error) {
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: error.response?.data?.message || 'Failed to create category',
+        text2: error.response?.data?.message || `Failed to ${editingCategory ? 'update' : 'create'} category`,
       });
     } finally {
       setLoading(false);
     }
   };
 
+  const handleEditCategory = (category) => {
+    setEditingCategory(category);
+    setCategoryName(category.name);
+  };
+
   const handleDeleteCategory = (categoryId) => {
     Alert.alert(
       'Delete Category',
-      'Are you sure you want to delete this category?',
+      'Are you sure you want to move this category to recycle bin?',
       [
         {
           text: 'Cancel',
@@ -97,11 +120,11 @@ const CategoryScreen = () => {
                   Authorization: `Bearer ${currentUser.token}`,
                 },
               });
-              fetchCategories(); // Refresh the list
+              fetchCategories();
               Toast.show({
                 type: 'success',
                 text1: 'Success',
-                text2: 'Category deleted successfully',
+                text2: 'Category moved to recycle bin',
               });
             } catch (error) {
               Toast.show({
@@ -122,10 +145,10 @@ const CategoryScreen = () => {
   return (
     <Layout>
       <View className="flex-1 p-4 bg-background-light dark:bg-background-dark">
-        {/* Create Category Form */}
+        {/* Create/Update Category Form */}
         <View className="mb-6">
           <Text className="text-xl font-bold text-primary-light dark:text-primary-dark mb-2">
-            Create New Category
+            {editingCategory ? 'Edit Category' : 'Create New Category'}
           </Text>
           <View className="flex-row">
             <TextInput
@@ -137,14 +160,25 @@ const CategoryScreen = () => {
             />
             <TouchableOpacity
               className={`bg-primary-light dark:bg-primary-dark p-3 rounded-r-lg ${loading ? 'opacity-70' : ''}`}
-              onPress={handleCreateCategory}
+              onPress={handleCreateOrUpdateCategory}
               disabled={loading}
             >
               <Text className="text-white font-semibold">
-                {loading ? 'Adding...' : 'Add'}
+                {loading ? 'Processing...' : editingCategory ? 'Update' : 'Add'}
               </Text>
             </TouchableOpacity>
           </View>
+          {editingCategory && (
+            <TouchableOpacity
+              className="mt-2"
+              onPress={() => {
+                setEditingCategory(null);
+                setCategoryName('');
+              }}
+            >
+              <Text className="text-red-500">Cancel Edit</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Categories List */}
@@ -167,15 +201,23 @@ const CategoryScreen = () => {
                   key={category._id}
                   className="flex-row justify-between items-center bg-white dark:bg-secondary-dark p-4 rounded-lg mb-2"
                 >
-                  <Text className="text-primary-light dark:text-white text-lg">
+                  <Text className="text-primary-light dark:text-white text-lg flex-1">
                     {category.name}
                   </Text>
-                  <TouchableOpacity
-                    onPress={() => handleDeleteCategory(category._id)}
-                    disabled={loading}
-                  >
-                    <Trash2 size={20} color="#ef4444" />
-                  </TouchableOpacity>
+                  <View className="flex-row gap-2">
+                    <TouchableOpacity
+                      onPress={() => handleEditCategory(category)}
+                      disabled={loading}
+                    >
+                      <Edit2 size={20} color="#3b82f6" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleDeleteCategory(category._id)}
+                      disabled={loading}
+                    >
+                      <Trash2 size={20} color="#ef4444" />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               ))}
             </ScrollView>
