@@ -16,7 +16,25 @@ multicurrency suppoert
 dark mode -----------> DOne
 
 
+1) Expneses display total in profile screen,
+2) Duplication error in catrgory cant add same name of category
+
 ADMIN PANEL BANAUNEY jum ma chahi
 sab same hunxa admin ley pani yo feature use garna milxa tara tehi tyo profile dropdown ma new menu aauxa 
 jasma chahi admin panel extra nav hunxa 
 
+
+
+
+
+//expense schema
+// Update user's total expenses after saving an expense
+// expenseSchema.post('save', async function () {
+//   const user = await mongoose.model('User').findById(this.user);
+//   const expenses = await mongoose.model('Expense').aggregate([
+//     { $match: { user: this.user } },
+//     { $group: { _id: null, total: { $sum: '$amount' } } },
+//   ]);
+//   user.expenses = expenses.length > 0 ? expenses[0].total : 0;
+//   await user.save();
+// });

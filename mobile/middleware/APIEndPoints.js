@@ -23,10 +23,15 @@ const APIEndPoints = {
         url: `${SERVER_DOMAIN}/users`,
         method: 'PUT'
     },
-    delete_user:{
+    delete_user: {
         url: `${SERVER_DOMAIN}/users`,
         method: 'DELETE'
     },
+    getUserProfile: {
+        url: `${SERVER_DOMAIN}/users/profile`,
+    },
+
+    //category
     getCategories: {
         url: `${SERVER_DOMAIN}/categories`,
         method: 'GET'
@@ -57,6 +62,48 @@ const APIEndPoints = {
     },
     getDeletedCategories: {
         url: `${SERVER_DOMAIN}/categories/deleted`,
+        method: 'GET'
+    },
+
+    //expenses
+    createExpense: {
+        url: `${SERVER_DOMAIN}/expenses`,
+        method: 'POST'
+    },
+    getUserExpenses: {
+        url: `${SERVER_DOMAIN}/expenses`,
+        method: 'GET'
+    },
+    updateExpense: {
+        url: `${SERVER_DOMAIN}/expenses`,
+        method: 'PUT'
+    },
+    deleteExpense: {
+        url: `${SERVER_DOMAIN}/expenses`,
+        method: 'DELETE'
+    },
+    permanentDeleteExpense: {
+        url: `${SERVER_DOMAIN}/expenses/permanent`,
+        method: 'DELETE'
+    },
+    restoreExpense: {
+        url: `${SERVER_DOMAIN}/expenses/restore`,
+        method: 'PATCH'
+    },
+    restoreAllExpenses: {
+        url: `${SERVER_DOMAIN}/expenses/restore-all`,
+        method: 'PATCH'
+    },
+    permanentDeleteAllExpenses: {
+        url: `${SERVER_DOMAIN}/expenses/all-deleted`,
+        method: 'DELETE'
+    },
+    getTotalExpensesCount: {
+        url: `${SERVER_DOMAIN}/expenses/count`,
+        method: 'GET'
+    },
+    getDeletedExpenses: {
+        url: `${SERVER_DOMAIN}/expenses/deleted`,
         method: 'GET'
     }
 }

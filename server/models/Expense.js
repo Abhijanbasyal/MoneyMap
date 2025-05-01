@@ -1,5 +1,9 @@
 
-// File: models/Expense.js
+
+
+
+// export default mongoose.model('Expense', expenseSchema);
+
 import mongoose from 'mongoose';
 
 const expenseSchema = new mongoose.Schema({
@@ -26,19 +30,12 @@ const expenseSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  isDeleted: {
+    type: Number,
+    default: 1, // 1 for active, 0 for soft deleted
+  },
 }, {
   timestamps: true,
-});
-
-// Update user's total expenses after saving an expense
-expenseSchema.post('save', async function () {
-  const user = await mongoose.model('User').findById(this.user);
-  const expenses = await mongoose.model('Expense').aggregate([
-    { $match: { user: this.user } },
-    { $group: { _id: null, total: { $sum: '$amount' } } },
-  ]);
-  user.expenses = expenses.length > 0 ? expenses[0].total : 0;
-  await user.save();
 });
 
 export default mongoose.model('Expense', expenseSchema);

@@ -1,3 +1,5 @@
+
+
 import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import Layout from '../layout/Layout';
@@ -10,7 +12,7 @@ import { Trash2, RotateCcw } from 'lucide-react-native';
 const RecycleBinScreen = () => {
   const [activeTab, setActiveTab] = useState('categories');
   const [deletedCategories, setDeletedCategories] = useState([]);
-  const [deletedExpenses, setDeletedExpenses] = useState([]); 
+  const [deletedExpenses, setDeletedExpenses] = useState([]);
   const [loading, setLoading] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
 
@@ -28,6 +30,26 @@ const RecycleBinScreen = () => {
         type: 'error',
         text1: 'Error',
         text2: error.response?.data?.message || 'Failed to fetch deleted categories',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDeletedExpenses = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${APIEndPoints.getDeletedExpenses.url}/${currentUser._id}`, {
+        headers: {
+          Authorization: `Bearer ${currentUser.token}`,
+        },
+      });
+      setDeletedExpenses(response.data);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error.response?.data?.message || 'Failed to fetch deleted expenses',
       });
     } finally {
       setLoading(false);
@@ -115,6 +137,87 @@ const RecycleBinScreen = () => {
     );
   };
 
+  const handleRestoreExpense = (expenseId) => {
+    Alert.alert(
+      'Restore Expense',
+      'Are you sure you want to restore this expense?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Restore',
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await axios.patch(`${APIEndPoints.restoreExpense.url}/${expenseId}`, {}, {
+                headers: {
+                  Authorization: `Bearer ${currentUser.token}`,
+                },
+              });
+              fetchDeletedExpenses();
+              Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: 'Expense restored successfully',
+              });
+            } catch (error) {
+              Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: error.response?.data?.message || 'Failed to restore expense',
+              });
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handlePermanentDeleteExpense = (expenseId) => {
+    Alert.alert(
+      'Permanent Delete',
+      'Are you sure you want to permanently delete this expense? This action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await axios.delete(`${APIEndPoints.permanentDeleteExpense.url}/${expenseId}`, {
+                headers: {
+                  Authorization: `Bearer ${currentUser.token}`,
+                },
+              });
+              fetchDeletedExpenses();
+              Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: 'Expense permanently deleted',
+              });
+            } catch (error) {
+              Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: error.response?.data?.message || 'Failed to permanently delete expense',
+              });
+            } finally {
+              setLoading(false);
+            }
+          },
+          style: 'destructive',
+        },
+      ]
+    );
+  };
+
   const handleRestoreAllCategories = () => {
     Alert.alert(
       'Restore All Categories',
@@ -155,11 +258,93 @@ const RecycleBinScreen = () => {
     );
   };
 
+  const handleRestoreAllExpenses = () => {
+    Alert.alert(
+      'Restore All Expenses',
+      'Are you sure you want to restore all deleted expenses?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Restore All',
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await axios.patch(APIEndPoints.restoreAllExpenses.url, {}, {
+                headers: {
+                  Authorization: `Bearer ${currentUser.token}`,
+                },
+              });
+              fetchDeletedExpenses();
+              Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: 'All expenses restored successfully',
+              });
+            } catch (error) {
+              Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: error.response?.data?.message || 'Failed to restore expenses',
+              });
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handlePermanentDeleteAllExpenses = () => {
+    Alert.alert(
+      'Permanent Delete All Expenses',
+      'Are you sure you want to permanently delete all deleted expenses? This action cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete All',
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await axios.delete(APIEndPoints.permanentDeleteAllExpenses.url, {
+                headers: {
+                  Authorization: `Bearer ${currentUser.token}`,
+                },
+              });
+              fetchDeletedExpenses();
+              Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: 'All deleted expenses permanently removed',
+              });
+            } catch (error) {
+              Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: error.response?.data?.message || 'Failed to permanently delete expenses',
+              });
+            } finally {
+              setLoading(false);
+            }
+          },
+          style: 'destructive',
+        },
+      ]
+    );
+  };
+
   useEffect(() => {
     if (activeTab === 'categories') {
       fetchDeletedCategories();
+    } else {
+      fetchDeletedExpenses();
     }
-    // Add logic for fetching deleted expenses when implemented
   }, [activeTab]);
 
   return (
@@ -205,6 +390,28 @@ const RecycleBinScreen = () => {
             </Text>
           </TouchableOpacity>
         )}
+        {activeTab === 'expenses' && deletedExpenses.length > 0 && (
+          <View className="flex-row gap-2 mb-4">
+            <TouchableOpacity
+              className="flex-1 bg-blue-500 p-3 rounded-lg"
+              onPress={handleRestoreAllExpenses}
+              disabled={loading}
+            >
+              <Text className="text-white text-center font-semibold">
+                {loading ? 'Processing...' : 'Restore All Expenses'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="flex-1 bg-red-500 p-3 rounded-lg"
+              onPress={handlePermanentDeleteAllExpenses}
+              disabled={loading}
+            >
+              <Text className="text-white text-center font-semibold">
+                {loading ? 'Processing...' : 'Permanently Delete All'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Content */}
         <View className="flex-1">
@@ -249,9 +456,46 @@ const RecycleBinScreen = () => {
               </ScrollView>
             )
           ) : (
-            <Text className="text-center text-secondary-light dark:text-secondary-dark">
-              Expense deletion not implemented yet
-            </Text>
+            deletedExpenses.length === 0 ? (
+              <Text className="text-center text-secondary-light dark:text-secondary-dark">
+                No deleted expenses found
+              </Text>
+            ) : (
+              <ScrollView className="flex-1">
+                {deletedExpenses.map((expense) => (
+                  <View
+                    key={expense._id}
+                    className="flex-row justify-between items-center bg-white dark:bg-secondary-dark p-4 rounded-lg mb-2"
+                  >
+                    <View className="flex-1">
+                      <Text className="text-primary-light dark:text-white text-lg">
+                        ${expense.amount} - {expense.category.name}
+                      </Text>
+                      <Text className="text-secondary-light dark:text-secondary-dark">
+                        {expense.description || 'No description'}
+                      </Text>
+                      <Text className="text-secondary-light dark:text-secondary-dark text-sm">
+                        {new Date(expense.date).toLocaleDateString()}
+                      </Text>
+                    </View>
+                    <View className="flex-row gap-2">
+                      <TouchableOpacity
+                        onPress={() => handleRestoreExpense(expense._id)}
+                        disabled={loading}
+                      >
+                        <RotateCcw size={20} color="#22c55e" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => handlePermanentDeleteExpense(expense._id)}
+                        disabled={loading}
+                      >
+                        <Trash2 size={20} color="#ef4444" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              </ScrollView>
+            )
           )}
         </View>
       </View>

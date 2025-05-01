@@ -2,9 +2,9 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Modal, Pres
 import React, { useState, useEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux'
-import { 
-  updateUserStart, 
-  updateUserSuccess, 
+import {
+  updateUserStart,
+  updateUserSuccess,
   updateUserFailure,
   signOutUserStart,
   signOutUserSuccess,
@@ -27,10 +27,11 @@ const ProfileScreen = () => {
     email: '',
     password: '',
     address: '',
-    expenses: 0
+    expenses: currentUser.expenses || 0
   })
   const [isEditing, setIsEditing] = useState(false)
   const [deleteModalVisible, setDeleteModalVisible] = useState(false)
+  
 
   useEffect(() => {
     if (currentUser) {
@@ -56,13 +57,13 @@ const ProfileScreen = () => {
   const handleUpdate = async () => {
     try {
       dispatch(updateUserStart())
-      
+
       const updateData = {
         name: formData.name,
         email: formData.email,
         address: formData.address,
       }
-      
+
       // Only include password if it was changed
       if (formData.password) {
         updateData.password = formData.password
@@ -92,7 +93,7 @@ const ProfileScreen = () => {
   const handleSignOut = async () => {
     try {
       dispatch(signOutUserStart())
-      
+
       await axios.post(
         APIEndPoints.logOutUser.url,
         {},
@@ -103,7 +104,7 @@ const ProfileScreen = () => {
           }
         }
       )
-      
+
       dispatch(signOutUserSuccess())
       navigation.navigate('Login')
       showToast('success', 'Success', 'Logged out successfully')
@@ -117,7 +118,7 @@ const ProfileScreen = () => {
   const handleDeleteAccount = async () => {
     try {
       dispatch(deleteUserStart())
-      
+
       await axios.delete(
         `${APIEndPoints.delete_user.url}/${currentUser._id}`,
         {
@@ -127,7 +128,7 @@ const ProfileScreen = () => {
           }
         }
       )
-      
+
       dispatch(deleteUserSuccess())
       navigation.navigate('Login')
       showToast('success', 'Success', 'Account deleted successfully')
@@ -200,7 +201,7 @@ const ProfileScreen = () => {
               Personal Information
             </Text>
             {!isEditing ? (
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => setIsEditing(true)}
                 className="bg-accent-light dark:bg-accent-dark p-2 rounded-full"
               >
@@ -208,14 +209,14 @@ const ProfileScreen = () => {
               </TouchableOpacity>
             ) : (
               <View className="flex-row space-x-2">
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={handleUpdate}
                   className="bg-primary-light dark:bg-primary-dark p-2 rounded-full"
                   disabled={loading}
                 >
                   <Icon name="check" size={20} color="white" />
                 </TouchableOpacity>
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={() => {
                     setIsEditing(false)
                     // Reset form to original values
@@ -242,7 +243,7 @@ const ProfileScreen = () => {
                 <TextInput
                   className="border border-gray-300 dark:border-gray-600 rounded p-2 text-primary-light dark:text-white"
                   value={formData.name}
-                  onChangeText={(text) => setFormData({...formData, name: text})}
+                  onChangeText={(text) => setFormData({ ...formData, name: text })}
                 />
               ) : (
                 <Text className="text-primary-light dark:text-white text-lg">{formData.name}</Text>
@@ -255,7 +256,7 @@ const ProfileScreen = () => {
                 <TextInput
                   className="border border-gray-300 dark:border-gray-600 rounded p-2 text-primary-light dark:text-white"
                   value={formData.email}
-                  onChangeText={(text) => setFormData({...formData, email: text})}
+                  onChangeText={(text) => setFormData({ ...formData, email: text })}
                   keyboardType="email-address"
                 />
               ) : (
@@ -269,7 +270,7 @@ const ProfileScreen = () => {
                 <TextInput
                   className="border border-gray-300 dark:border-gray-600 rounded p-2 text-primary-light dark:text-white"
                   value={formData.address}
-                  onChangeText={(text) => setFormData({...formData, address: text})}
+                  onChangeText={(text) => setFormData({ ...formData, address: text })}
                   multiline
                 />
               ) : (
@@ -285,7 +286,7 @@ const ProfileScreen = () => {
                 <TextInput
                   className="border border-gray-300 dark:border-gray-600 rounded p-2 text-primary-light dark:text-white"
                   value={formData.password}
-                  onChangeText={(text) => setFormData({...formData, password: text})}
+                  onChangeText={(text) => setFormData({ ...formData, password: text })}
                   secureTextEntry
                   placeholder="Leave blank to keep current"
                 />
@@ -298,7 +299,7 @@ const ProfileScreen = () => {
           <Text className="text-lg font-semibold text-primary-light dark:text-primary-dark mb-4">
             Expense Summary
           </Text>
-          
+
           <View className="flex-row justify-between items-center p-4 bg-background-light dark:bg-background-dark rounded-lg">
             <View className="flex-row items-center">
               <Icon name="attach-money" size={24} color="#328E6E" />
@@ -306,6 +307,10 @@ const ProfileScreen = () => {
             </View>
             <Text className="text-xl font-bold text-primary-light dark:text-primary-dark">
               ${formData.expenses.toFixed(2)}
+              {/* <div className='text-white'>
+                {currentUser.expenses}
+              </div> */}
+
             </Text>
           </View>
         </View>
@@ -340,3 +345,4 @@ const ProfileScreen = () => {
 }
 
 export default ProfileScreen
+

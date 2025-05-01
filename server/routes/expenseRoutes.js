@@ -1,12 +1,32 @@
-// File: routes/expenseRoutes.js
+
 import express from 'express';
-import { createExpense, getUserExpenses, updateExpense, deleteExpense } from '../controllers/expenseController.js';
+import {
+  createExpense,
+  getUserExpenses,
+  getUserDeletedExpenses,
+  updateExpense,
+  deleteExpense,
+  permanentDeleteExpense,
+  restoreExpense,
+  restoreAllExpenses,
+  permanentDeleteAllExpenses,
+  getTotalExpensesCount
+} from '../controllers/expenseController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.post('/', createExpense); // Unrestricted for testing
-router.get('/:id', getUserExpenses); // Unrestricted for testing
-router.put('/:id', updateExpense); // Unrestricted for testing
-router.delete('/:id', deleteExpense); // Unrestricted for testing
+router.use(protect);
+
+router.post('/', createExpense);
+router.get('/:id', getUserExpenses);
+router.get('/deleted/:id', getUserDeletedExpenses);
+router.put('/:id', updateExpense);
+router.delete('/:id', deleteExpense);
+router.delete('/permanent/:id', permanentDeleteExpense);
+router.patch('/restore/:id', restoreExpense);
+router.patch('/restore-all', restoreAllExpenses);
+router.delete('/all-deleted', permanentDeleteAllExpenses);
+router.get('/count/:id', getTotalExpensesCount);
 
 export default router;
