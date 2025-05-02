@@ -6,6 +6,7 @@ import Toast from 'react-native-toast-message';
 import APIEndPoints from '../middleware/APIEndPoints';
 import { useDispatch, useSelector } from 'react-redux';
 import { Trash2, Edit2 } from 'lucide-react-native';
+import { addNotification } from '../redux/notificationSlice';
 
 const CategoryScreen = () => {
   const [categoryName, setCategoryName] = useState('');
@@ -13,6 +14,7 @@ const CategoryScreen = () => {
   const [loading, setLoading] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const fetchCategories = async () => {
     try {
@@ -37,6 +39,29 @@ const CategoryScreen = () => {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+
+  const createNotification = async (description, redirectUrl = '/Category') => {
+    try {
+      const response = await axios.post(
+        APIEndPoints.createNotification.url,
+        {
+          userId: currentUser._id,
+          description,
+          redirectUrl,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${currentUser.token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      dispatch(addNotification(response.data.data));
+    } catch (error) {
+      console.error('Failed to create notification:', error);
+    }
+  };
 
   const handleCreateOrUpdateCategory = async () => {
     if (!categoryName.trim()) {
@@ -63,6 +88,7 @@ const CategoryScreen = () => {
             },
           }
         );
+        await createNotification(`Category "${categoryName}" updated successfully`);
       } else {
         // Create new category
         response = await axios.post(
@@ -75,6 +101,7 @@ const CategoryScreen = () => {
             },
           }
         );
+        await createNotification(`Category "${categoryName}" created successfully`);
       }
 
       setCategoryName('');
@@ -121,6 +148,7 @@ const CategoryScreen = () => {
                 },
               });
               fetchCategories();
+              await createNotification('Category deleted successfully');
               Toast.show({
                 type: 'success',
                 text1: 'Success',

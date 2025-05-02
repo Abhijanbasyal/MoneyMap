@@ -1,6 +1,7 @@
 // const SERVER_DOMAIN = "http://192.168.1.88:8000/api" //hostel_4/5 Wifi
-const SERVER_DOMAIN = "http://192.168.100.78:8000/api" //hostel_4/5 Wifi
+// const SERVER_DOMAIN = "http://192.168.100.78:8000/api" //hostel_4/5 Wifi
 // const SERVER_DOMAIN = "http://192.168.80.41:8000/api" //wifi others
+const SERVER_DOMAIN = "http://192.168.80.41:8000/api" //wifi others
 
 
 
@@ -105,7 +106,30 @@ const APIEndPoints = {
     getDeletedExpenses: {
         url: `${SERVER_DOMAIN}/expenses/deleted`,
         method: 'GET'
-    }
-}
+    },
+
+    //notification
+    createNotification: {
+        url: `${SERVER_DOMAIN}/notifications`,
+        method: 'POST',
+    },
+    getNotifications: {
+        url: `${SERVER_DOMAIN}/notifications`,
+        method: 'GET',
+    },
+    getNotificationById: {
+        url: `${SERVER_DOMAIN}/notifications`,
+        method: 'GET',
+    },
+    deleteNotification: {
+        url: `${SERVER_DOMAIN}/notifications`,
+        method: 'DELETE',
+    },
+    deleteAllNotifications: {
+        url: `${SERVER_DOMAIN}/notifications/delete-all`,
+        method: 'DELETE',
+    },
+
+};
 
 export default APIEndPoints;
